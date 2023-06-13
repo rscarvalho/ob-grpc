@@ -153,12 +153,14 @@ in PROTO-FILE and IMPORT-PATHS.  Else return methods under SERVICE."
 	 (import-paths (split-string (org-entry-get nil "PROTO-IMPORT-PATH" t) " "))
 	 (grpc-endpoint (org-entry-get nil "GRPC-ENDPOINT" t))
 	 (plain-text (org-entry-get nil "PLAIN-TEXT" t))
-         (method (alist-get :method params)))
+         (method (alist-get :method params))
+	 (max-time (org-entry-get nil "GRPC-TIMEOUT" t)))
     (shell-command-to-string
-     (message "grpcurl %s -proto %s %s -d %s \"%s\" \"%s\""
+     (message "grpcurl %s -proto %s %s %s -d %s \"%s\" \"%s\""
 	      (ob-grpc--concat-imports import-paths)
 	      proto-file
 	      (if (equal plain-text "no") "" "-plaintext")
+	      (if (equal max-time nil) "" (concat "-max-time " max-time))
 	      (prin1-to-string body)
 	      grpc-endpoint
 	      method
